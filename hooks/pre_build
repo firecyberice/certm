@@ -13,9 +13,10 @@ function compile(){
   "go get -v -d github.com/ehazlett/certm \
   && cd \$GOPATH/src/github.com/ehazlett/certm \
   && go get -v -d ./... \
+  && echo 'start compiling' \
   && go build -a -tags 'netgo' -o /data/certm \
--ldflags '-w -linkmode external -extldflags -static \
--X github.com/ehazlett/certm/version.GitCommit ${COMMIT}'"
+  -ldflags '-w -linkmode external -extldflags -static \
+  -X github.com/ehazlett/certm/version.GitCommit ${COMMIT}'"
 
 }
 
