@@ -3,7 +3,7 @@
 function compile(){
   local ARCH="${1}"
   echo "==> compiling for $ARCH"  
-  docker run --rm -t -i \
+  docker run --rm -t \
   -e CGO_ENABLED=0 \
   -e GOOS=linux \
   -e GOARCH=$ARCH \
