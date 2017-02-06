@@ -1,1 +1,23 @@
 #!/bin/bash
+
+function compile(){
+  local COMMIT=`git rev-parse --short HEAD`
+  local ARCH="${1}"
+  docker run --rm -t \
+  -e CGO_ENABLED=0 \
+  -e GOOS=linux \
+  -e GOARCH=$ARCH \
+  -e COMMIT=$COMMIT \
+  -v $(pwd)/content:/data \
+  golang:1.8 bash -c \
+  "go get -v -d github.com/ehazlett/certm \
+  && cd \$GOPATH/src/github.com/ehazlett/certm \
+  && go get -v -d ./... \
+  && go build -a -tags 'netgo' -o /data/certm \
+-ldflags '-w -linkmode external -extldflags -static \
+-X github.com/ehazlett/certm/version.GitCommit ${COMMIT}'"
+
+}
+
+compile $DOCKER_TAG
+
