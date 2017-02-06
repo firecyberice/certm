@@ -3,22 +3,29 @@
 function compile(){
   local COMMIT=`git rev-parse --short HEAD`
   local ARCH="${1}"
-  docker run --rm -t \
+  docker run --rm -t -i \
   -e CGO_ENABLED=0 \
   -e GOOS=linux \
   -e GOARCH=$ARCH \
   -e COMMIT=$COMMIT \
-  -v $(pwd)/content:/data \
+  -v $(pwd):/data \
   golang:1.8 bash -c \
-  "go get -v -d github.com/ehazlett/certm \
+  "apt-get update && apt-get install -y gccgo \
+  && go get -v -d github.com/ehazlett/certm \
   && cd \$GOPATH/src/github.com/ehazlett/certm \
+  && echo 'get deps' \
+  && go get -v -d ./... \
+  ; echo 'cleanup' \
+  && rm -rf /go/src/github.com/Sirupsen \
+  && find /go/src/ -type f -name '*.go' | xargs perl -i -pne 's|Sirupsen|sirupsen|' \
   && go get -v -d ./... \
   && echo 'start compiling' \
-  && go build -a -tags 'netgo' -o /data/certm \
-  -ldflags '-w -linkmode external -extldflags -static \
-  -X github.com/ehazlett/certm/version.GitCommit ${COMMIT}'"
+  && go build -a -tags 'netgo' -o /data/certm --installsuffix cgo \
+  --ldflags='-s -w -linkmode external -extldflags -static \
+  -X github.com/ehazlett/certm/version.GitCommit=${COMMIT}' || bash"
 
 }
 
 compile $DOCKER_TAG
+
 
