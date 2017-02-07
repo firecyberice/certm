@@ -1,13 +1,11 @@
 #!/bin/bash
 
 function compile(){
-  local ARCH="${1}"
-  echo "==> compiling for $ARCH"  
+  echo "==> compiling for $DOCKER_TAG"  
   docker run --rm -t \
   -e CGO_ENABLED=0 \
   -e GOOS=linux \
-  -e GOARCH=$ARCH \
-  -e COMMIT=$COMMIT \
+  -e GOARCH=$DOCKER_TAG \
   -v $(pwd):/data \
   golang:1.8 bash -c \
   "apt-get update && apt-get install -y gccgo \
@@ -21,12 +19,11 @@ function compile(){
   && find /go/src/ -type f -name '*.go' | xargs perl -i -pne 's|Sirupsen|sirupsen|' \
   && go get -v -d ./... \
   && echo 'start compiling' \
-  && go build -a -tags 'netgo' -o /data/certm --installsuffix cgo \
+  && go build -a -tags 'netgo' -o /data/certm-\$GOARCH --installsuffix cgo \
   --ldflags='-s -w -linkmode external -extldflags -static \
-  -X github.com/ehazlett/certm/version.GitCommit=${COMMIT}' || bash"
-
+  -X github.com/ehazlett/certm/version.GitCommit=\${COMMIT}'"
 }
 
-compile $DOCKER_TAG
+compile
 
 

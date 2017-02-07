@@ -1,3 +1,7 @@
 FROM scratch
-COPY certm /bin/certm
+
+ARG ARCH=amd64
+COPY certm-${ARCH} /bin/certm
+
 ENTRYPOINT ["/bin/certm"]
+CMD ["--help"]
