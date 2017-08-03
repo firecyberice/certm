@@ -8,7 +8,7 @@ function compile(){
   -e GOARCH=$DOCKER_TAG \
   -v $(pwd):/data \
   golang:1.8 bash -c \
-  "apt-get update && apt-get install -y gccgo \
+  "apt-get update && apt-get install -y gccgo gcc \
   && go get -v -d github.com/ehazlett/certm \
   && cd \$GOPATH/src/github.com/ehazlett/certm \
   && export COMMIT=`git rev-parse --short HEAD` \
